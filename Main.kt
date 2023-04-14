@@ -1,19 +1,15 @@
 package processor
 
-import kotlin.system.exitProcess
-
 fun main() {
-    val (rowsOfMatrixA, columnsOfMatrixA) = readln().split(" ").map { it.toInt() }
-    val matrixA = List(rowsOfMatrixA) { readln().split(" ").map { it.toInt() } }
-    val (rowsOfMatrixB, columnsOfMatrixB) = readln().split(" ").map { it.toInt() }
-    val matrixB = List(rowsOfMatrixB) { readln().split(" ").map { it.toInt() } }
+    val (rowsOfMatrix, columnsOfMatrix) = readln().split(" ").map { it.toInt() }
+    val matrix = List(rowsOfMatrix) { readln().split(" ").map { it.toInt() } }
+    val multiplier = readln().toInt()
 
-    if (rowsOfMatrixA != rowsOfMatrixB && columnsOfMatrixA != columnsOfMatrixB) println("ERROR").also { exitProcess(1) }
-    val finalMatrix = MutableList(rowsOfMatrixA) { MutableList(columnsOfMatrixA) { 0 } }
+    val finalMatrix = MutableList(rowsOfMatrix) { MutableList(columnsOfMatrix) { 0 } }
 
     for (i in finalMatrix.indices) {
         for (j in finalMatrix[0].indices) {
-            finalMatrix[i][j] = matrixA[i][j] + matrixB[i][j]
+            finalMatrix[i][j] = matrix[i][j] * multiplier
         }
     }
 
