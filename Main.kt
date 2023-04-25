@@ -70,6 +70,75 @@ fun multiplyMatrices() {
     println()
 }
 
+fun transpose() {
+    println("1. Main diagonal\n" +
+            "2. Side diagonal\n" +
+            "3. Vertical line\n" +
+            "4. Horizontal line")
+
+    val choice = readln()
+    println("Enter matrix size:")
+    val (rowsOfMatrix, columnsOfMatrix) = readln().split(" ").map { it.toInt() }
+    println("Enter matrix:")
+    val matrix = List(rowsOfMatrix) { readln().split(" ") }
+
+    val result = when(choice) {
+        "1" -> transposeMainDiagonal(matrix)
+        "2" -> transposeSideDiagonal(matrix)
+        "3" -> transposeVerticalLine(matrix)
+        else -> transposeHorizontalLine(matrix)
+    }
+
+    println(result.joinToString("\n") { row -> row.joinToString(" ") } + "\n")
+}
+
+fun transposeMainDiagonal(matrix : List<List<String>>) : List<List<String>> {
+    val result = MutableList(matrix.size) { MutableList(matrix.size) { "" } }
+
+    for (i in matrix.indices) {
+        for (j in matrix[0].indices) {
+            result[i][j] = matrix[j][i]
+        }
+    }
+    return result
+}
+
+fun transposeSideDiagonal(matrix : List<List<String>>) : List<List<String>> {
+    val result = MutableList(matrix.size) { MutableList(matrix.size) { "" } }
+
+    for (i in matrix.indices) {
+        for (j in matrix[0].indices) {
+            result[i][j] = matrix[matrix.lastIndex - j][matrix.lastIndex - i]
+        }
+    }
+
+    return result
+}
+
+fun transposeVerticalLine(matrix : List<List<String>>) : List<List<String>> {
+    val result = MutableList(matrix.size) { MutableList(matrix.size) { "" } }
+
+    for (i in matrix.indices) {
+        for (j in matrix[0].indices) {
+            result[i][j] = matrix[i][matrix.lastIndex - j]
+        }
+    }
+
+    return result
+}
+
+fun transposeHorizontalLine(matrix : List<List<String>>) : List<List<String>> {
+    val result = MutableList(matrix.size) { MutableList(matrix.size) { "" } }
+
+    for (i in matrix.indices) {
+        for (j in matrix[0].indices) {
+            result[i][j] = matrix[matrix.lastIndex - i][j]
+        }
+    }
+
+    return result
+}
+
 fun main() {
 
     while (true) {
@@ -77,6 +146,7 @@ fun main() {
             "1. Add matrices\n" +
             "2. Multiply matrix by a constant\n" +
             "3. Multiply matrices\n" +
+            "4. Transpose matrix\n" +
             "0. Exit"
         )
 
@@ -85,6 +155,7 @@ fun main() {
             "1" -> addMatrices()
             "2" -> multiplyByConstant()
             "3" -> multiplyMatrices()
+            "4" -> transpose()
         }
     }
 
