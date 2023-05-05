@@ -1,5 +1,9 @@
 package processor
 
+import java.lang.Math.pow
+import kotlin.math.pow
+import kotlin.system.exitProcess
+
 fun multiplyByConstant() {
     val (rowsOfMatrix, columnsOfMatrix) = readln().split(" ").map { it.toInt() }
     val matrix = List(rowsOfMatrix) { readln().split(" ").map { it.toDouble() } }
@@ -139,6 +143,37 @@ fun transposeHorizontalLine(matrix : List<List<String>>) : List<List<String>> {
     return result
 }
 
+fun determine() {
+    println("Enter matrix size:")
+    val (rowsOfMatrix, columnsOfMatrix) = readln().split(" ").map { it.toInt() }
+    println("Enter matrix:")
+    val matrix = List(rowsOfMatrix) { readln().split(" ").map { it.toDouble() } }
+
+    if (rowsOfMatrix != columnsOfMatrix) println("Matrix is not a square matrix").also { return }
+
+    println(determinant(matrix))
+}
+
+// Counting determinant of matrix using Minor and Cofactor
+fun determinant(matrix: List<List<Double>>): Double {
+    var result = 0.0
+
+    return if (matrix.size == 2) {
+        matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0]
+    } else {
+        for (i in 0..matrix.lastIndex) {
+            val list = matrix.map { it.toMutableList() }.toMutableList()
+            list.removeAt(0)
+            for (row in list) {
+                row.removeAt(i)
+            }
+
+            result += matrix[0][i] * (-1.0).pow(2.0 + i) * determinant(list)
+        }
+        result
+    }
+}
+
 fun main() {
 
     while (true) {
@@ -147,6 +182,7 @@ fun main() {
             "2. Multiply matrix by a constant\n" +
             "3. Multiply matrices\n" +
             "4. Transpose matrix\n" +
+            "5. Calculate a determinant\n" +
             "0. Exit"
         )
 
@@ -156,8 +192,8 @@ fun main() {
             "2" -> multiplyByConstant()
             "3" -> multiplyMatrices()
             "4" -> transpose()
+            "5" -> determine()
         }
     }
-
 
 }
