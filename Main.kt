@@ -1,24 +1,20 @@
 package processor
 
 import java.lang.Math.pow
+import kotlin.math.absoluteValue
 import kotlin.math.pow
 import kotlin.system.exitProcess
 
-fun multiplyByConstant() {
-    val (rowsOfMatrix, columnsOfMatrix) = readln().split(" ").map { it.toInt() }
-    val matrix = List(rowsOfMatrix) { readln().split(" ").map { it.toDouble() } }
-    val multiplier = readln().toDouble()
-
-    val finalMatrix = MutableList(rowsOfMatrix) { MutableList(columnsOfMatrix) { 0.0 } }
+fun multiplyByConstant(matrix: MutableList<MutableList<Double>>, multiplier: Double): MutableList<MutableList<Double>> {
+    val finalMatrix = MutableList(matrix.size) { MutableList(matrix[0].size) { 0.0 } }
 
     for (i in finalMatrix.indices) {
         for (j in finalMatrix[0].indices) {
+            if (matrix[i][j] == 0.0) continue
             finalMatrix[i][j] = matrix[i][j] * multiplier
         }
     }
-
-    println(finalMatrix.joinToString("\n") { row -> row.joinToString(" ") })
-    println()
+    return finalMatrix
 }
 
 fun addMatrices() {
@@ -75,18 +71,22 @@ fun multiplyMatrices() {
 }
 
 fun transpose() {
-    println("1. Main diagonal\n" +
-            "2. Side diagonal\n" +
-            "3. Vertical line\n" +
-            "4. Horizontal line")
+    println(
+        "1. Main diagonal\n" +
+                "2. Side diagonal\n" +
+                "3. Vertical line\n" +
+                "4. Horizontal line"
+    )
 
     val choice = readln()
     println("Enter matrix size:")
     val (rowsOfMatrix, columnsOfMatrix) = readln().split(" ").map { it.toInt() }
     println("Enter matrix:")
-    val matrix = List(rowsOfMatrix) { readln().split(" ") }
+    val matrix = MutableList(rowsOfMatrix) {
+        readln().split(" ").map { it.toDouble() }.toMutableList()
+    }
 
-    val result = when(choice) {
+    val result = when (choice) {
         "1" -> transposeMainDiagonal(matrix)
         "2" -> transposeSideDiagonal(matrix)
         "3" -> transposeVerticalLine(matrix)
@@ -96,8 +96,8 @@ fun transpose() {
     println(result.joinToString("\n") { row -> row.joinToString(" ") } + "\n")
 }
 
-fun transposeMainDiagonal(matrix : List<List<String>>) : List<List<String>> {
-    val result = MutableList(matrix.size) { MutableList(matrix.size) { "" } }
+fun transposeMainDiagonal(matrix: MutableList<MutableList<Double>>): MutableList<MutableList<Double>> {
+    val result = MutableList(matrix.size) { MutableList(matrix.size) { 0.0 } }
 
     for (i in matrix.indices) {
         for (j in matrix[0].indices) {
@@ -107,8 +107,8 @@ fun transposeMainDiagonal(matrix : List<List<String>>) : List<List<String>> {
     return result
 }
 
-fun transposeSideDiagonal(matrix : List<List<String>>) : List<List<String>> {
-    val result = MutableList(matrix.size) { MutableList(matrix.size) { "" } }
+fun transposeSideDiagonal(matrix: MutableList<MutableList<Double>>): MutableList<MutableList<Double>> {
+    val result = MutableList(matrix.size) { MutableList(matrix.size) { 0.0 } }
 
     for (i in matrix.indices) {
         for (j in matrix[0].indices) {
@@ -119,8 +119,8 @@ fun transposeSideDiagonal(matrix : List<List<String>>) : List<List<String>> {
     return result
 }
 
-fun transposeVerticalLine(matrix : List<List<String>>) : List<List<String>> {
-    val result = MutableList(matrix.size) { MutableList(matrix.size) { "" } }
+fun transposeVerticalLine(matrix: MutableList<MutableList<Double>>): MutableList<MutableList<Double>> {
+    val result = MutableList(matrix.size) { MutableList(matrix.size) { 0.0 } }
 
     for (i in matrix.indices) {
         for (j in matrix[0].indices) {
@@ -131,8 +131,8 @@ fun transposeVerticalLine(matrix : List<List<String>>) : List<List<String>> {
     return result
 }
 
-fun transposeHorizontalLine(matrix : List<List<String>>) : List<List<String>> {
-    val result = MutableList(matrix.size) { MutableList(matrix.size) { "" } }
+fun transposeHorizontalLine(matrix: MutableList<MutableList<Double>>): MutableList<MutableList<Double>> {
+    val result = MutableList(matrix.size) { MutableList(matrix.size) { 0.0 } }
 
     for (i in matrix.indices) {
         for (j in matrix[0].indices) {
@@ -158,8 +158,8 @@ fun determine() {
 fun determinant(matrix: List<List<Double>>): Double {
     var result = 0.0
 
-    return if (matrix.size == 2) {
-        matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0]
+    if (matrix.size == 2) {
+        result = matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0]
     } else {
         for (i in 0..matrix.lastIndex) {
             val list = matrix.map { it.toMutableList() }.toMutableList()
@@ -167,11 +167,38 @@ fun determinant(matrix: List<List<Double>>): Double {
             for (row in list) {
                 row.removeAt(i)
             }
-
             result += matrix[0][i] * (-1.0).pow(2.0 + i) * determinant(list)
         }
-        result
     }
+    return if (result == -0.0) result.absoluteValue else result
+}
+
+fun inverse() {
+    println("Enter matrix size:")
+    val (rowsOfMatrix, columnsOfMatrix) = readln().split(" ").map { it.toInt() }
+    println("Enter matrix:")
+    val matrix = List(rowsOfMatrix) { readln().split(" ").map { it.toDouble() } }
+    val det = determinant(matrix)
+    if (det == 0.0) println("This matrix doesn't have an inverse.").also { return }
+
+    var result = mutableListOf<MutableList<Double>>()
+
+    for (i in 0..matrix.lastIndex) {
+        result.add(mutableListOf())
+        for (j in 0..matrix.lastIndex) {
+            val list = matrix.map { it.toMutableList() }.toMutableList()
+            list.removeAt(i)
+            for (row in list) {
+                row.removeAt(j)
+            }
+            val deter = determinant(list) * (-1.0).pow(2.0 + i + j)
+            result[i].add(deter)
+        }
+    }
+    result = transposeMainDiagonal(result)
+    result = multiplyByConstant(result, 1.0 / det)
+    println(result.joinToString("\n") { row -> row.joinToString(" ") })
+    println()
 }
 
 fun main() {
@@ -179,20 +206,28 @@ fun main() {
     while (true) {
         println(
             "1. Add matrices\n" +
-            "2. Multiply matrix by a constant\n" +
-            "3. Multiply matrices\n" +
-            "4. Transpose matrix\n" +
-            "5. Calculate a determinant\n" +
-            "0. Exit"
+                    "2. Multiply matrix by a constant\n" +
+                    "3. Multiply matrices\n" +
+                    "4. Transpose matrix\n" +
+                    "5. Calculate a determinant\n" +
+                    "6. Inverse matrix\n" +
+                    "0. Exit"
         )
 
         when (readln()) {
             "0" -> return
             "1" -> addMatrices()
-            "2" -> multiplyByConstant()
+            "2" -> {
+                val (rowsOfMatrix, _) = readln().split(" ").map { it.toInt() }
+                multiplyByConstant(MutableList(rowsOfMatrix) {
+                    readln().split(" ").map { it.toDouble() }.toMutableList()
+                }, readln().toDouble()).joinToString("\n") { row -> row.joinToString(" ") }.let(::println)
+            }
+
             "3" -> multiplyMatrices()
             "4" -> transpose()
             "5" -> determine()
+            "6" -> inverse()
         }
     }
 
