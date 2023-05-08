@@ -5,6 +5,13 @@ import kotlin.math.absoluteValue
 import kotlin.math.pow
 import kotlin.system.exitProcess
 
+fun matrix(name: String = "") : MutableList<MutableList<Double>> {
+    println("Enter size of ${name}matrix:")
+    val (rowsOfMatrixA, columnsOfMatrixA) = readln().split(" ").map { it.toInt() }
+    println("Enter ${name}matrix:")
+    return MutableList(rowsOfMatrixA) { readln().split(" ").map { it.toDouble() }.toMutableList() }
+}
+
 fun multiplyByConstant(matrix: MutableList<MutableList<Double>>, multiplier: Double): MutableList<MutableList<Double>> {
     val finalMatrix = MutableList(matrix.size) { MutableList(matrix[0].size) { 0.0 } }
 
@@ -18,19 +25,13 @@ fun multiplyByConstant(matrix: MutableList<MutableList<Double>>, multiplier: Dou
 }
 
 fun addMatrices() {
-    println("Enter size of first matrix:")
-    val (rowsOfMatrixA, columnsOfMatrixA) = readln().split(" ").map { it.toInt() }
-    println("Enter first matrix:")
-    val matrixA = List(rowsOfMatrixA) { readln().split(" ").map { it.toDouble() } }
-    println("Enter size of second matrix:")
-    val (rowsOfMatrixB, columnsOfMatrixB) = readln().split(" ").map { it.toInt() }
-    println("Enter second matrix:")
-    val matrixB = List(rowsOfMatrixB) { readln().split(" ").map { it.toDouble() } }
+    val matrixA = matrix("first ")
+    val matrixB = matrix("second ")
 
-    if (rowsOfMatrixA != rowsOfMatrixB && columnsOfMatrixA != columnsOfMatrixB) {
+    if (matrixA.size != matrixB.size && matrixA[0].size != matrixB[0].size) {
         println("The operation cannot be performed.").also { return }
     }
-    val finalMatrix = MutableList(rowsOfMatrixA) { MutableList(columnsOfMatrixA) { 0.0 } }
+    val finalMatrix = MutableList(matrixA.size) { MutableList(matrixA[0].size) { 0.0 } }
 
     for (i in finalMatrix.indices) {
         for (j in finalMatrix[0].indices) {
@@ -43,23 +44,17 @@ fun addMatrices() {
 }
 
 fun multiplyMatrices() {
-    println("Enter size of first matrix:")
-    val (rowsOfMatrixA, columnsOfMatrixA) = readln().split(" ").map { it.toInt() }
-    println("Enter first matrix:")
-    val matrixA = List(rowsOfMatrixA) { readln().split(" ").map { it.toDouble() } }
-    println("Enter size of second matrix:")
-    val (rowsOfMatrixB, columnsOfMatrixB) = readln().split(" ").map { it.toInt() }
-    println("Enter second matrix:")
-    val matrixB = List(rowsOfMatrixB) { readln().split(" ").map { it.toDouble() } }
+    val matrixA = matrix("first ")
+    val matrixB = matrix("second ")
 
-    if (columnsOfMatrixA != rowsOfMatrixB) println("The operation cannot be performed.").also { return }
+    if (matrixA[0].size != matrixB.size) println("The operation cannot be performed.").also { return }
 
-    val finalMatrix = MutableList(rowsOfMatrixA) { MutableList(columnsOfMatrixB) { 0.0 } }
+    val finalMatrix = MutableList(matrixA.size) { MutableList(matrixB[0].size) { 0.0 } }
 
     for (i in matrixA.indices) {
         for (j in matrixB[0].indices) {
             var result = 0.0
-            repeat(rowsOfMatrixB) {
+            repeat(matrixB.size) {
                 result += matrixA[i][it] * matrixB[it][j]
             }
             finalMatrix[i][j] = result
@@ -79,12 +74,7 @@ fun transpose() {
     )
 
     val choice = readln()
-    println("Enter matrix size:")
-    val (rowsOfMatrix, columnsOfMatrix) = readln().split(" ").map { it.toInt() }
-    println("Enter matrix:")
-    val matrix = MutableList(rowsOfMatrix) {
-        readln().split(" ").map { it.toDouble() }.toMutableList()
-    }
+    val matrix = matrix("")
 
     val result = when (choice) {
         "1" -> transposeMainDiagonal(matrix)
@@ -144,13 +134,8 @@ fun transposeHorizontalLine(matrix: MutableList<MutableList<Double>>): MutableLi
 }
 
 fun determine() {
-    println("Enter matrix size:")
-    val (rowsOfMatrix, columnsOfMatrix) = readln().split(" ").map { it.toInt() }
-    println("Enter matrix:")
-    val matrix = List(rowsOfMatrix) { readln().split(" ").map { it.toDouble() } }
-
-    if (rowsOfMatrix != columnsOfMatrix) println("Matrix is not a square matrix").also { return }
-
+    val matrix = matrix()
+    if (matrix.size != matrix[0].size) println("Matrix is not a square matrix").also { return }
     println(determinant(matrix))
 }
 
@@ -174,10 +159,7 @@ fun determinant(matrix: List<List<Double>>): Double {
 }
 
 fun inverse() {
-    println("Enter matrix size:")
-    val (rowsOfMatrix, columnsOfMatrix) = readln().split(" ").map { it.toInt() }
-    println("Enter matrix:")
-    val matrix = List(rowsOfMatrix) { readln().split(" ").map { it.toDouble() } }
+    val matrix = matrix()
     val det = determinant(matrix)
     if (det == 0.0) println("This matrix doesn't have an inverse.").also { return }
 
@@ -202,7 +184,6 @@ fun inverse() {
 }
 
 fun main() {
-
     while (true) {
         println(
             "1. Add matrices\n" +
@@ -218,10 +199,8 @@ fun main() {
             "0" -> return
             "1" -> addMatrices()
             "2" -> {
-                val (rowsOfMatrix, _) = readln().split(" ").map { it.toInt() }
-                multiplyByConstant(MutableList(rowsOfMatrix) {
-                    readln().split(" ").map { it.toDouble() }.toMutableList()
-                }, readln().toDouble()).joinToString("\n") { row -> row.joinToString(" ") }.let(::println)
+                multiplyByConstant(matrix(""), readln().toDouble())
+                    .joinToString("\n") { row -> row.joinToString(" ") }.let(::println)
             }
 
             "3" -> multiplyMatrices()
